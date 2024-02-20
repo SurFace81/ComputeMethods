@@ -1,41 +1,35 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def func1(x, y):
-    # return 1 / (x**1.5 + 1) - y
-    return x - y - 1
+def Func(X):
+    return np.array([
+        1 / (X[0]**1.5 + 1) - X[1],
+        X[0]**2 + X[1]**2 - 9
+    ])
 
-def func2(x, y):
-    # return x**2 + y **2 - 9
-    return x + 3 * y - 9
-
-def Func(x, y):
-    return np.array([func1(x, y),
-                    func2(x, y)])
-
-def Jacobian(x, y):
-    # J = np.array([[(-3 * np.sqrt(x) / (2 * x**3 + 4 * x**1.5 + 2)), 2 * x],
-    #               [-1, 2 * y]])
-    # return np.linalg.inv(J)
-    J = np.array([[1, 1],
-                  [-1, 3]])
-    return J
+def Jacobian(X):
+    return np.array([
+        [- (3/2) * (X[0]**(1/2)) / ((X[0]**(3/2) + 1)**2), -1],
+        [2 * X[0], 2 * X[1]]
+    ])
 
 eps = 0.0001
 
-def newthon_method(F, X):
-    Xn = X - np.linalg.inv(Jacobian(X[0], X[1])) @ F(X[0], X[1])
-    Fxn = F(Xn[0], Xn[1])
+def newthon_method(F, X, cntr):
+    J = Jacobian(X)
+    Xn = X - np.linalg.inv(J) @ F(X)
+    Fxn = F(Xn)
 
     if np.sqrt(Fxn[0]**2 + Fxn[1]**2) < eps:
-        return X[0], X[1], J
+        return X[0], X[1], Fxn, cntr
     else:
-        return newthon_method(F, Xn)
+        cntr += 1
+        return newthon_method(F, Xn, cntr)
     
 
-x, y, j = newthon_method(Func, np.array([1, 0]))
+x, y, func, cntr = newthon_method(Func, np.array([1, 1]), 1)
 print("x1 =", x)
 print("x2 =", y)
-print("\nf1 =", func1(x, y))
-print("f2 =", func2(x, y))
-print("\nJ =", j)
+print("\nf1 =", func[0])
+print("f2 =", func[1])
+print("\ncount =", cntr)
