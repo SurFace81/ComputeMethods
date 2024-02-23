@@ -35,13 +35,13 @@ def chords(f, cntr, a, b):
         
 
 # dichotomy method
-x1, fx1, count = dichotomy(func, 1, -0.3, 0.3)
+x1, fx1, count = dichotomy(func, 1, -1.5, 1.5)
 print("x1 =", x1)
 print("fx1 =", fx1)
 print("cnt =", count)
 
-# method of chords
-x1, fx1, count = chords(func, 1, -0.3, 0.3)
+# chord method
+x1, fx1, count = chords(func, 1, -1.5, 1.5)
 print("\nx1 =", x1)
 print("fx1 =", fx1)
 print("cnt =", count)

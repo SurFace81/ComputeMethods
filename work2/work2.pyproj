@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>3136ac20-74ab-4543-881c-ffa0ca165b43</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>work2_2.py</StartupFile>
+    <StartupFile>work2.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
