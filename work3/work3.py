@@ -52,12 +52,11 @@ def divided_diff(x, y):
 
 data = tools.read_file()
 
+
 # lagrange interp.
-y = []
-x = np.linspace(0, 12, 12)
 start = 1889
-for index in range(start, start + 12):
-    y += [data[index][5]]
+y = [data[i][5] for i in range(start, start + 12)]
+x = np.linspace(0, 12, 12)
 print(y)
 
 x_interp = np.arange(0, 12, 0.1)
