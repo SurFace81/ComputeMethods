@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 def read_file():
     file = pd.read_csv("11.csv")
     file = file.iloc[:, :-1]
+    print(file, "\n.............................................................................................\n\n")
     data = {}
     for index, row in file.iterrows():
         year = int(row.iloc[0])

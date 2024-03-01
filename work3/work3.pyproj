@@ -21,6 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="test.py" />
     <Compile Include="tools.py" />
     <Compile Include="work3.py" />
   </ItemGroup>
