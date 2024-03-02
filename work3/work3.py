@@ -38,6 +38,17 @@ def newton_interpolation2(x, y, x_new):
         interpolated_value += term
     return interpolated_value
 
+# def poly_approx(x, y):
+#     n = len(x)
+#     X = np.array([[x[i]**j for j in range(6)] for i in range(n)])
+#     coefficients = np.linalg.lstsq(X, y, rcond=None)[0]
+#     return coefficients
+
+# def poly_val(coefficients, x):
+#     n = len(coefficients)
+#     y = sum(coefficients[i] * x**i for i in range(n))
+#     return y
+
 
 def divided_diff(x, y):
     n = len(y)
@@ -59,7 +70,7 @@ y = [data[i][5] for i in range(start, start + 12)]
 x = np.linspace(0, 12, 12)
 print(y)
 
-x_interp = np.arange(0, 12, 0.1)
+x_interp = np.arange(min(x), max(x) + 0.1, 0.1)
 y_interp = [lagrange_interpolation(x, y, xi) for xi in x_interp]
 tools.graph(x, y, x_interp, y_interp)
 
@@ -82,3 +93,14 @@ print(y2)
 x_interp = np.arange(min(x2), max(x2) + 0.1, 0.1)
 y_interp = [newton_interpolation2(x2, y2, xi) for xi in x_interp]
 tools.graph(x2, y2, x_interp, y_interp)
+
+# approx. with 5th degree polynome
+#
+# y_all = [data[1875 + i][5] for i in range(len(data)) if data[1875 + i][5] != 999.9]
+# n = len(y_all)
+# x3 = np.linspace(0, n, n)
+# coefficients = poly_approx(x3, y_all)
+
+# x_interp = np.arange(min(x3), max(x3) + 0.1, 0.1)
+# y_interp = [poly_val(coefficients, xi) for xi in x_interp]
+# tools.graph(x3,  y_all, x_interp, y_interp)

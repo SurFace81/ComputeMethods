@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>aedb22ba-1fea-4f83-b130-d7b24322a48e</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>work3.py</StartupFile>
+    <StartupFile>test.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,6 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="test.py" />
+    <Compile Include="test1.py" />
     <Compile Include="tools.py" />
     <Compile Include="work3.py" />
   </ItemGroup>
