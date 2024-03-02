@@ -13,8 +13,10 @@ def read_file():
         data[year] = values
     return data
 
-def graph(x, y, x_interp, y_interp):
-    plt.plot(x, y, "o")
+def plot(x, y, x_interp, y_interp, title=""):
+    plt.figure(figsize=(8, 5))
+    plt.plot(x, y, 'o')
     plt.plot(x_interp, y_interp, color='red')
     plt.grid(True)
+    plt.title(title)
     plt.show()
