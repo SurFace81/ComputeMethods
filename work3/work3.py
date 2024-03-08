@@ -38,16 +38,27 @@ def newton_interp2(x, y, x_new):
         interpolated_value += term
     return interpolated_value
 
-def poly_approx(x, y):
-    n = len(x)
-    X = np.array([[x[i]**j for j in range(6)] for i in range(n)])
-    coefficients = np.linalg.lstsq(X, y, rcond=None)[0]
+def divided_diff(x, y):
+    n = len(y)
+    F = [[None] * n for _ in range(n)]
+    for i in range(n):
+        F[i][0] = y[i]
+    for j in range(1, n):
+        for i in range(n - j):
+            F[i][j] = (F[i + 1][j - 1] - F[i][j - 1]) / (x[i + j] - x[i])
+    return F
+
+
+def poly_approx(x, y, degree):
+    X = np.column_stack([x**i for i in range(degree + 1)])
+    coefficients = np.linalg.solve(np.linalg.inv(X.T @ X), X.T @ y)
     return coefficients
 
-def poly_val(coefficients, x):
+def poly_eval(coefficients, x):
     n = len(coefficients)
     y = sum(coefficients[i] * x**i for i in range(n))
     return y
+
 
 # def trig_interp(x_values, y_values, x):
 #     n = len(x_values)
@@ -59,16 +70,6 @@ def poly_val(coefficients, x):
 #     coeffs = np.linalg.lstsq(matrx, y_values, rcond=None)[0]
 #     return sum([coeffs[i] * np.cos(i * x) for i in range(n)])
 
-
-def divided_diff(x, y):
-    n = len(y)
-    F = [[None] * n for _ in range(n)]
-    for i in range(n):
-        F[i][0] = y[i]
-    for j in range(1, n):
-        for i in range(n - j):
-            F[i][j] = (F[i + 1][j - 1] - F[i][j - 1]) / (x[i + j] - x[i])
-    return F
 
 def cubic_spline(x, y):
     n = len(x)
@@ -148,25 +149,36 @@ tools.plot(x2, y2, x_interp, y_interp, "(Newthon ver. 2) y: [" + '; '.join(str(_
 y_all = [data[1875 + i][5] for i in range(len(data)) if data[1875 + i][5] != 999.9]
 n = len(y_all)
 x3 = np.linspace(0, n, n)
-coefficients = poly_approx(x3, y_all)
-x_interp = np.arange(min(x3), max(x3) + 0.1, 0.1)
-y_interp = [poly_val(coefficients, xi) for xi in x_interp]
-tools.plot(x3,  y_all, x_interp, y_interp, "(Approximation)")
+
+fig, axs = plt.subplots(nrows=1, ncols=5, sharex=True, sharey=True)
+for d, ax in zip(range(1, 6), axs.flat):
+    coefficients = poly_approx(x3, y_all, d)
+    x_interp = np.arange(min(x3), max(x3) + 0.1, 0.1)
+    y_interp = [poly_eval(coefficients, xi) for xi in x_interp]
+    ax.plot(x3, y_all, 'o')
+    ax.plot(x_interp, y_interp, 'red')
+    ax.set_title('Degree {}'.format(d))
+plt.show()
+
+plt.plot(x3, y_all, "o")
+plt.plot(x_interp, y_interp, "red")
+plt.title("Approximation ({} degree)".format(5))
+plt.show()
 
 
 # cubic spline interp.
-y3 = y
-x3 = np.linspace(0, 12, 12)
-b, c, d = cubic_spline(x3, y3)
-x_interp = np.arange(min(x3), max(x3) + 0.1, 0.1)
-y_interp = evaluate_spline(x3, y3, b, c, d, x_interp)
-tools.plot(x3, y3, x_interp, y_interp, "(Cubic spline) y: [" + '; '.join(str(_) for _ in y3) + "]")
+# y3 = y
+# x3 = np.linspace(0, 12, 12)
+# b, c, d = cubic_spline(x3, y3)
+# x_interp = np.arange(min(x3), max(x3) + 0.1, 0.1)
+# y_interp = evaluate_spline(x3, y3, b, c, d, x_interp)
+# tools.plot(x3, y3, x_interp, y_interp, "(Cubic spline) y: [" + '; '.join(str(_) for _ in y3) + "]")
 
 
 # trig. interp.
 # y_all = [data[1875 + i][5] for i in range(len(data)) if data[1875 + i][5] != 999.9]
 # n = len(y_all)
-# x3 = np.linspace(0, n, n)
-# x_interp = np.arange(min(x3), max(x3) + 0.1, 0.1)
-# y_interp = [trig_interp(x3, y_all, xi) for xi in x_interp]
-# tools.plot(x3, y3, x_interp, y_interp, "(Trig. interp)")
+# x4 = np.linspace(0, n, n)
+# x_interp = np.arange(min(x4), max(x4) + 0.1, 0.1)
+# y_interp = [trig_interp(x4, y_all, xi) for xi in x_interp]
+# tools.plot(x4, y_all, x_interp, y_interp, "(Trig. interp)")

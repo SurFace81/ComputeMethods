@@ -21,10 +21,8 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="lagrange.py" />
-    <Compile Include="test.py" />
-    <Compile Include="test1.py" />
-    <Compile Include="test3.py" />
+    <Compile Include="poly.py" />
+    <Compile Include="polyt.py" />
     <Compile Include="tools.py" />
     <Compile Include="work3.py" />
   </ItemGroup>
