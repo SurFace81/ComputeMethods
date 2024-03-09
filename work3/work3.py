@@ -3,6 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tools
 
+# =========
+# Functions
+# =========
 def lagrange_interp(x, y, x_interp):
     n = len(x)
     result = 0
@@ -51,24 +54,42 @@ def divided_diff(x, y):
 
 def poly_approx(x, y, degree):
     X = np.column_stack([x**i for i in range(degree + 1)])
-    coefficients = np.linalg.solve(np.linalg.inv(X.T @ X), X.T @ y)
-    return coefficients
+    coeffs = np.linalg.solve(X.T @ X, X.T @ y)
+    return coeffs
 
-def poly_eval(coefficients, x):
-    n = len(coefficients)
-    y = sum(coefficients[i] * x**i for i in range(n))
+def poly_val(coeffs, x):
+    n = len(coeffs)
+    y = sum(coeffs[i] * x**i for i in range(n))
     return y
 
 
-# def trig_interp(x_values, y_values, x):
-#     n = len(x_values)
-    
-#     matrx = np.zeros((n, n))
-#     for i in range(n):
-#         matrx[:, i] = np.cos(i * np.array(x_values))
-    
-#     coeffs = np.linalg.lstsq(matrx, y_values, rcond=None)[0]
-#     return sum([coeffs[i] * np.cos(i * x) for i in range(n)])
+def trig_interp(x, y, func):
+    n = len(x)
+    X = np.column_stack([func(k * x) for k in range(n)])
+    coeffs = np.linalg.lstsq(X, y, rcond=None)[0]
+    return coeffs
+
+def trig_val(coeffs, xi, func):
+    n = len(coeffs)
+    y = sum(coeffs[k] * func(k * xi) for k in range(n))
+    return y
+
+
+def orth_exp_coeffs(x_values, y_values):
+    n = len(x_values)
+    V = np.zeros((n, n), dtype=np.complex_)
+    for i in range(n):
+        for j in range(n):
+            V[i, j] = np.exp(1j * i * x_values[j])
+    return np.linalg.solve(V, y_values)
+
+def orth_exp_approx(x_interp, coeffs):
+    n = len(coeffs)
+    y_interp = np.zeros_like(x_interp, dtype=np.complex_)
+    for i in range(len(x_interp)):
+        for j in range(n):
+            y_interp[i] += coeffs[j] * np.exp(1j * j * x_interp[i])
+    return y_interp
 
 
 def cubic_spline(x, y):
@@ -76,16 +97,15 @@ def cubic_spline(x, y):
     h = np.diff(x)  # Compute the differences between consecutive x values
     alpha = np.zeros(n)
     for i in range(1, n - 1):
-        # Compute alpha values based on the given data points
         alpha[i] = 3 / h[i] * (y[i + 1] - y[i]) - 3 / h[i - 1] * (y[i] - y[i - 1])
 
-    # Initialize arrays for tridiagonal matrix algorithm (Thomas algorithm)
+    # Initialize arrays for tridiagonal matrix algorithm
     l = np.zeros(n)
     mu = np.zeros(n)
     z = np.zeros(n)
     l[0] = 1
 
-    # Forward pass of Thomas algorithm
+    # Forward pass
     for i in range(1, n - 1):
         l[i] = 2 * (x[i + 1] - x[i - 1]) - h[i - 1] * mu[i - 1]
         mu[i] = h[i] / l[i]
@@ -97,7 +117,7 @@ def cubic_spline(x, y):
     b = np.zeros(n)
     d = np.zeros(n)
 
-    # Backward pass of Thomas algorithm to find coefficients c
+    # Backward pass to find coefficients c
     for j in range(n - 2, -1, -1):
         c[j] = z[j] - mu[j] * c[j + 1]
         b[j] = (y[j + 1] - y[j]) / h[j] - h[j] * (c[j + 1] + 2 * c[j]) / 3
@@ -117,8 +137,10 @@ def evaluate_spline(x, y, b, c, d, x_new):
     return np.array(spline_values)
 
 
+# ===========================
+# Examples of Using Functions
+# ===========================
 data = tools.read_file()
-
 
 # lagrange interp.
 start = 1889
@@ -154,7 +176,7 @@ fig, axs = plt.subplots(nrows=1, ncols=5, sharex=True, sharey=True)
 for d, ax in zip(range(1, 6), axs.flat):
     coefficients = poly_approx(x3, y_all, d)
     x_interp = np.arange(min(x3), max(x3) + 0.1, 0.1)
-    y_interp = [poly_eval(coefficients, xi) for xi in x_interp]
+    y_interp = [poly_val(coefficients, xi) for xi in x_interp]
     ax.plot(x3, y_all, 'o')
     ax.plot(x_interp, y_interp, 'red')
     ax.set_title('Degree {}'.format(d))
@@ -167,18 +189,31 @@ plt.show()
 
 
 # cubic spline interp.
-# y3 = y
-# x3 = np.linspace(0, 12, 12)
-# b, c, d = cubic_spline(x3, y3)
-# x_interp = np.arange(min(x3), max(x3) + 0.1, 0.1)
-# y_interp = evaluate_spline(x3, y3, b, c, d, x_interp)
-# tools.plot(x3, y3, x_interp, y_interp, "(Cubic spline) y: [" + '; '.join(str(_) for _ in y3) + "]")
+y3 = y
+x3 = np.linspace(0, 12, 12)
+b, c, d = cubic_spline(x3, y3)
+x_interp = np.arange(min(x3), max(x3) + 0.1, 0.1)
+y_interp = evaluate_spline(x3, y3, b, c, d, x_interp)
+tools.plot(x3, y3, x_interp, y_interp, "(Cubic spline) y: [" + '; '.join(str(_) for _ in y3) + "]")
 
 
 # trig. interp.
-# y_all = [data[1875 + i][5] for i in range(len(data)) if data[1875 + i][5] != 999.9]
-# n = len(y_all)
-# x4 = np.linspace(0, n, n)
-# x_interp = np.arange(min(x4), max(x4) + 0.1, 0.1)
-# y_interp = [trig_interp(x4, y_all, xi) for xi in x_interp]
-# tools.plot(x4, y_all, x_interp, y_interp, "(Trig. interp)")
+y_all = [data[1875 + i][5] for i in range(len(data)) if data[1875 + i][5] != 999.9]
+n = len(y_all)
+x4 = np.linspace(0, n, n)
+
+x_interp = np.arange(min(x4), max(x4) + 0.1, 0.1)
+coeffs = trig_interp(x4, y_all, np.sin)
+y_interp = [trig_val(coeffs, xi, np.sin) for xi in x_interp]
+tools.plot(x4, y_all, x_interp, y_interp, "(Trig. interp.)")
+
+
+# orth. approx.
+y_all = [data[1875 + i][5] for i in range(len(data)) if data[1875 + i][5] != 999.9]
+n = len(y_all)
+x5 = np.linspace(0, n, n)
+
+coeffs = orth_exp_coeffs(x5, y_all)
+x_interp = np.arange(min(x5), max(x5) + 0.1, 0.1)
+y_interp = orth_exp_approx(x_interp, coeffs)
+tools.plot(x5, y_all, x_interp, y_interp, "(Orth. approx.)")
