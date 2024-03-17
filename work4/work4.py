@@ -12,6 +12,23 @@ def moving_average(data, window_size):
         moving_averages.append(average)
     return np.array(moving_averages)
 
+def detrend(data):
+    time = np.arange(len(data))
+    
+    # interp.
+    x_interp = np.linspace(min(time), max(time), len(time) * 1)
+    coeffs = np.polyfit(time, data, 5)
+    poly = np.poly1d(coeffs)
+    y_interp = poly(x_interp)
+    
+    plt.figure(figsize=(10, 6))
+    # plt.plot(time, data, 'o', markersize=1)
+    # plt.plot(x_interp, y_interp, 'red')
+    plt.plot(time, data - y_interp, 'o', markersize=1)
+    plt.grid(True)
+    plt.title("Detrending")
+    plt.show()
+
 def DATA1():
     data = np.fromfile("z1.bin", dtype=np.int16)
     window_size = 10001
@@ -19,7 +36,6 @@ def DATA1():
     averages = moving_average(data, window_size)
     time = np.arange(len(data)) / 1000
     time_ma = np.arange(len(averages)) / 1000
-
 
     plt.figure(figsize=(10, 6))
     plt.plot(time, data)
@@ -73,6 +89,7 @@ def DATA3():
 
 
 if __name__ == "__main__":
-    # DATA1()
+    DATA1()
+    # detrend(np.fromfile("z1.bin", dtype=np.int16))
     # DATA2()
-    DATA3()
+    # DATA3()
