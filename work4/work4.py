@@ -17,17 +17,20 @@ def detrend(data):
     time = np.arange(len(data))
     coeffs = np.polyfit(time, data, 5)
     poly = np.polyval(coeffs, time)
+    return data - poly
     
-    plt.figure(figsize=(10, 6))
-    plt.plot(time, data, 'go', markersize=1)
-    plt.plot(time, data - poly, 'o', markersize=1)
-    plt.plot(time, poly, 'r-')
-    plt.grid(True)
-    plt.title("Detrending")
-    plt.show()
+    # plt.figure(figsize=(10, 6))
+    # plt.plot(time, data, 'go', markersize=1)
+    # plt.plot(time, data - poly, 'o', markersize=1)
+    # plt.plot(time, poly, 'r-')
+    # plt.grid(True)
+    # plt.title("Detrending")
+    # plt.show()
 
 def data1():
     data = np.fromfile("z1.bin", dtype=np.int16)
+    data = data[:-500000]
+    data = detrend(data)
     window_size = 10001
     averages = moving_average(data, window_size)
     time = np.arange(len(data)) / 1000
@@ -35,7 +38,7 @@ def data1():
 
     plt.figure(figsize=(10, 6))
     plt.plot(time, data, 'o', markersize=1)
-    plt.plot(time_ma + window_size / (2 * 1000), averages, 'r-')
+    plt.plot((time_ma + window_size / (2 * 1000)), averages, 'r-')
     plt.title('Moving Average')
     plt.grid(True)
     plt.show()
@@ -57,8 +60,10 @@ def data2():
     spectrum, f_axe = np.fft.fftshift((spectrum, f_axe))
 
     plt.figure(figsize=(14, 6))
-    plt.semilogy(spectrum, f_axe)
-    #plt.plot(spectrum, f_axe)
+    # plt.semilogy(spectrum, f_axe)
+    #plt.yticks(np.linspace(20 * np.log10(min(f_axe)), 20 * np.log10(max(f_axe))))
+    f_axe = 20 * np.log10(f_axe)
+    plt.plot(spectrum, f_axe)
     plt.xlabel("Frequency [Hz]")
     plt.ylabel("Amplitude")
     plt.xticks(np.linspace(min(spectrum), max(spectrum), 60, endpoint=True), rotation='vertical')
@@ -110,7 +115,7 @@ noverlap = 999
 Fs = 1000
 
 if __name__ == "__main__":
-    data1()
+    # data1()
     # detrend(np.fromfile("z1.bin", dtype=np.int16))
-    # data2()
+    data2()
     # data3()
