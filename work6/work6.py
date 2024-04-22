@@ -29,7 +29,7 @@ def gauss(X, fi):
 
     return x
 
-eps = 0.0001
+eps = 0.000001
 
 def gauss_seidel_ldu(X, fi):
     L, D, U = LDU(X)
@@ -70,6 +70,10 @@ coeffs, fi = system()
 eig = eigvals(coeffs)
 print('l_min =', min(eig))
 print('l_max =', max(eig), '\n')
+
+eig = np.linalg.eigvals(coeffs)
+print('np l_min =', min(eig))
+print('np l_max =', max(eig), '\n')
 
 # condition number
 print('mu =', norm_m(coeffs) * norm_m(np.linalg.inv(coeffs)), '\n')

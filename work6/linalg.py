@@ -40,7 +40,6 @@ def LDU(coeffs):
 
     return L, D, U
 
-
 def eigvals(A):  
     def iters(coeffs, n):
         b = np.ones(n)
