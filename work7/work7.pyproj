@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>ef71533e-76b7-4458-aed8-fc8a868d2aac</ProjectGuid>
+    <ProjectGuid>ad9ef29c-cd03-45a9-83e2-e6cea542ddec</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>work7.py</StartupFile>
     <SearchPath>
@@ -11,7 +11,6 @@
     <OutputPath>.</OutputPath>
     <Name>work7</Name>
     <RootNamespace>work7</RootNamespace>
-    <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,10 +21,12 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="method.py" />
     <Compile Include="minimization.py" />
     <Compile Include="test.py" />
     <Compile Include="work7.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="method.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

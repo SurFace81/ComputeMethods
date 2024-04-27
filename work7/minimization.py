@@ -82,17 +82,15 @@ def hooke_jeeves(f, x0, h, eps):
     
     return points_sequence, iterations
 
-import numpy as np
-
 def nelder_mead(f, x0, eps, alpha=1, beta=0.5, gamma=2):
-    # init
+    # Initialization
     n = len(x0)
-    simplex = np.zeros((n+1, n))
+    simplex = np.zeros((n + 1, n))
     simplex[0] = x0
     for i in range(n):
         x = np.array(x0, dtype=float)
         x[i] = x[i] + 0.1
-        simplex[i+1] = x
+        simplex[i + 1] = x
 
     f_values = np.array([f(*x) for x in simplex])
 
@@ -100,23 +98,23 @@ def nelder_mead(f, x0, eps, alpha=1, beta=0.5, gamma=2):
     trace = [simplex[0]]
     while n_iter < 1000 and np.max(np.abs(simplex[0] - simplex[1:])) > eps:
         n_iter += 1
-        
-        # Шаг 1: Сортировка вершин по значениям функции
+
+        # Step 1: Sort vertices by function values
         idx = np.argsort(f_values)
         simplex = simplex[idx]
         f_values = f_values[idx]
-        
-        # Шаг 2: Вычисление центра тяжести всех точек, кроме самой дальней
+
+        # Step 2: Compute the centroid of all points except the farthest one
         x_c = np.mean(simplex[:-1], axis=0)
-        
-        # Шаг 3: Отражение
+
+        # Step 3: Reflection
         x_r = x_c + alpha * (x_c - simplex[-1])
         f_r = f(*x_r)
-        
+
         if f_values[0] <= f_r < f_values[-2]:
             simplex[-1], f_values[-1] = x_r, f_r
         elif f_r < f_values[0]:
-            # Шаг 4: Растяжение
+            # Step 4: Expansion
             x_e = x_c + gamma * (x_r - x_c)
             f_e = f(*x_e)
             if f_e < f_r:
@@ -124,17 +122,93 @@ def nelder_mead(f, x0, eps, alpha=1, beta=0.5, gamma=2):
             else:
                 simplex[-1], f_values[-1] = x_r, f_r
         else:
-            # Шаг 5: Сжатие
+            # Step 5: Contraction
             x_s = x_c + beta * (simplex[-1] - x_c)
             f_s = f(*x_s)
             if f_s < f_values[-1]:
                 simplex[-1], f_values[-1] = x_s, f_s
             else:
-                # Шаг 6: Уменьшение симплекса
+                # Step 6: Reduction of the simplex
                 for i in range(1, len(simplex)):
                     simplex[i] = simplex[0] + 0.5 * (simplex[i] - simplex[0])
                     f_values[i] = f(*simplex[i])
-        
+
         trace.append(simplex[0])
-        
+
     return trace, n_iter
+
+def random_search(f, x_start, eps):
+    best_solution = None
+    best_score = float('inf')
+    f_min = -14.4724
+    trajectory = [x_start]
+    iters = 0
+    while abs(f_min - best_score) > eps:
+        iters += 1
+        solution = np.array([np.random.uniform(-15, 0), np.random.uniform(-15, 0)])
+        score = f(*solution)
+        if score < best_score:
+            best_solution = solution
+            best_score = score
+            trajectory.append(best_solution)
+    return np.array(trajectory), iters
+
+
+def golden(f, a, b, eps=1e-6):
+    golden_ratio = (1 + np.sqrt(5)) / 2
+
+    x1 = b - (b - a) / golden_ratio
+    x2 = a + (b - a) / golden_ratio
+
+    while abs(b - a) > eps:
+        if f(x1) < f(x2):
+            b = x2
+        else:
+            a = x1
+
+        x1 = b - (b - a) / golden_ratio
+        x2 = a + (b - a) / golden_ratio
+
+    return (a + b) / 2
+
+def powell_method(f, initial_point, eps):
+    # Function used to find the minimum
+    def f_wrapper(x):
+        return f(x[0], x[1])
+
+    # Initial point
+    x = np.array(initial_point)
+    # Initial axis directions
+    directions = np.identity(len(x))
+    # Iteration counter
+    iter_count = 0
+    # List to save the points visited by the method
+    points = [x.copy()]
+
+    while iter_count < 1000:
+        # Initialize a value to check convergence
+        delta = 0
+        # Traverse through all directions
+        for i in range(len(x)):
+            direction = directions[i]
+            # Minimize function f along a one-dimensional variable
+            alpha = golden(lambda alpha: f_wrapper(x + alpha * direction), -10, 10, eps)
+            # Update the current point
+            x = x + alpha * direction
+            # Calculate the change in the point
+            delta = max(delta, np.abs(alpha * direction).max())
+            # Add the point to the list
+            points.append(x.copy())
+
+        # If convergence is achieved, exit the loop
+        if delta < eps:
+            break
+
+        # Update axis directions
+        for i in range(len(x) - 1):
+            directions[i] = directions[i + 1]
+        directions[-1] = np.random.randn(len(x))
+
+        iter_count += 1
+
+    return points, iter_count

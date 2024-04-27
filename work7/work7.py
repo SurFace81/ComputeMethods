@@ -59,7 +59,7 @@ Z = func(X, Y)
 
 plt.figure(figsize=(8, 6))
 plt.contour(X, Y, Z, levels=30, cmap="plasma")
-plt.plot(points_seq[:, 0], points_seq[:, 1], '.-', color='r')
+plt.plot(points_seq[:, 0], points_seq[:, 1], '.-', color='r', label="Conj. gradients")
 
 # Hook-Jeevs
 seq, iters = mn.hooke_jeeves(func, start, 0.1, eps)
@@ -67,8 +67,7 @@ seq = np.array(seq)
 print("\nFunc val:", func(*seq[-1]))
 print("Min point:", seq[-1][0], seq[-1][1])
 print("Iters:", iters)
-
-plt.plot(seq[:, 0], seq[:, 1], '.-', color='g')
+plt.plot(seq[:, 0], seq[:, 1], '.-', color='g', label="Hook-Jeevs")
 
 # Nelder-Mead
 seq, iters = mn.nelder_mead(func, start, eps)
@@ -76,10 +75,27 @@ seq = np.array(seq)
 print("\nFunc val:", func(*seq[-1]))
 print("Min point:", seq[-1][0], seq[-1][1])
 print("Iters:", iters)
+plt.plot(seq[:, 0], seq[:, 1], '.-', color='b', label="Nelder-Mead")
 
-plt.plot(seq[:, 0], seq[:, 1], '.-', color='b')
+# Powell
+seq, iters = mn.powell_method(func, start, eps)
+seq = np.array(seq)
+print("\nFunc val:", func(*seq[-1]))
+print("Min point:", seq[-1][0], seq[-1][1])
+print("Iters:", iters)
+plt.plot(seq[:, 0], seq[:, 1], '.-', color='m', label="Powel")
+
+# Random search
+seq, iters = mn.random_search(func, start, 0.001)
+seq = np.array(seq)
+print("\nFunc val:", func(*seq[-1]))
+print("Min point:", seq[-1][0], seq[-1][1])
+print("Iters:", iters)
+plt.plot(seq[:, 0], seq[:, 1], '.-', color='black', label="Random search")
+
 plt.grid(True)
 plt.colorbar()
+plt.legend()
 plt.show()
 
 fig = plt.figure()
