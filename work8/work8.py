@@ -53,9 +53,9 @@ def Teilor(cntr, xrange, init):
         P = np.append(P, p)
         Q = np.append(Q, q)
         
-    return X, Y, P, Q
+    return X, Y, P, Q, h
 
-eps = 0.01
+eps = 0.0001
 N = 0
 
 while True:
@@ -69,8 +69,9 @@ while True:
 
 
 print("Iters: ", N)
-X, Y, P, Q = T2
+X, Y, P, Q, h = T2
 YY, PP, QQ = ode()
+print("h: ", h)
 
 # Solution graphs
 plt.plot(X, Y, '.-', color='black')
@@ -89,27 +90,26 @@ plt.title("y'(x)")
 plt.grid(True)
 plt.show()
 
-# plt.plot(X, Q, '.-', color='black')
-# plt.plot(X, QQ, '.', color='r')
-# plt.xlabel('x')
-# plt.ylabel("y''")
-# plt.title("y''(x)")
-# plt.grid(True)
-# plt.show()
-
 # Trajectories graphs
 plt.plot(Y, P, '.-', color='black')
 plt.plot(Y, PP, '.', color='r')
 plt.xlabel('y')
 plt.ylabel("y'")
-plt.title("y'(x)")
+plt.title("y'(y)")
 plt.grid(True)
 plt.show()
 
-# plt.plot(Y, Q, '.-', color='black')
-# plt.plot(Y, QQ, '.', color='r')
-# plt.xlabel('y')
-# plt.ylabel("y''")
-# plt.title("y''(y)")
-# plt.grid(True)
-# plt.show()
+# Difference
+plt.plot(X, abs(YY - Y), '.-', color='black')
+plt.xlabel('x')
+plt.ylabel("y")
+plt.title("Difference")
+plt.grid(True)
+plt.show()
+
+plt.plot(X, abs(PP - P), '.-', color='black')
+plt.xlabel('x')
+plt.ylabel("y'")
+plt.title("Difference")
+plt.grid(True)
+plt.show()
