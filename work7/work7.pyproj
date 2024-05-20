@@ -22,7 +22,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="minimization.py" />
-    <Compile Include="test.py" />
     <Compile Include="work7.py" />
   </ItemGroup>
   <ItemGroup>

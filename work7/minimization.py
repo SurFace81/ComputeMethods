@@ -1,4 +1,3 @@
-# -- coding: cp1251 --
 import numpy as np
 
 def unim(x0, h, f):
@@ -83,7 +82,6 @@ def hooke_jeeves(f, x0, h, eps):
     return points_sequence, iterations
 
 def nelder_mead(f, x0, eps, alpha=1, beta=0.5, gamma=2):
-    # Initialization
     n = len(x0)
     simplex = np.zeros((n + 1, n))
     simplex[0] = x0
@@ -96,7 +94,7 @@ def nelder_mead(f, x0, eps, alpha=1, beta=0.5, gamma=2):
 
     n_iter = 0
     trace = [simplex[0]]
-    while n_iter < 1000 and np.max(np.abs(simplex[0] - simplex[1:])) > eps:
+    while np.max(np.abs(simplex[0] - simplex[1:])) > eps:
         n_iter += 1
 
         # Step 1: Sort vertices by function values
@@ -104,17 +102,17 @@ def nelder_mead(f, x0, eps, alpha=1, beta=0.5, gamma=2):
         simplex = simplex[idx]
         f_values = f_values[idx]
 
-        # Step 2: Compute the centroid of all points except the farthest one
+        # Compute the centroid of all points except the farthest one
         x_c = np.mean(simplex[:-1], axis=0)
 
-        # Step 3: Reflection
+        # Reflection
         x_r = x_c + alpha * (x_c - simplex[-1])
         f_r = f(*x_r)
 
         if f_values[0] <= f_r < f_values[-2]:
             simplex[-1], f_values[-1] = x_r, f_r
         elif f_r < f_values[0]:
-            # Step 4: Expansion
+            # Expansion
             x_e = x_c + gamma * (x_r - x_c)
             f_e = f(*x_e)
             if f_e < f_r:
@@ -122,13 +120,13 @@ def nelder_mead(f, x0, eps, alpha=1, beta=0.5, gamma=2):
             else:
                 simplex[-1], f_values[-1] = x_r, f_r
         else:
-            # Step 5: Contraction
+            # Contraction
             x_s = x_c + beta * (simplex[-1] - x_c)
             f_s = f(*x_s)
             if f_s < f_values[-1]:
                 simplex[-1], f_values[-1] = x_s, f_s
             else:
-                # Step 6: Reduction of the simplex
+                # Reduction of the simplex
                 for i in range(1, len(simplex)):
                     simplex[i] = simplex[0] + 0.5 * (simplex[i] - simplex[0])
                     f_values[i] = f(*simplex[i])
@@ -154,7 +152,7 @@ def random_search(f, x_start, eps):
     return np.array(trajectory), iters
 
 
-def golden(f, a, b, eps=1e-6):
+def golden(f, a, b, eps):
     golden_ratio = (1 + np.sqrt(5)) / 2
 
     x1 = b - (b - a) / golden_ratio
@@ -171,40 +169,27 @@ def golden(f, a, b, eps=1e-6):
 
     return (a + b) / 2
 
-def powell_method(f, initial_point, eps):
-    # Function used to find the minimum
+def powell(f, x0, eps):
     def f_wrapper(x):
         return f(x[0], x[1])
 
-    # Initial point
-    x = np.array(initial_point)
-    # Initial axis directions
+    x = np.array(x0)
     directions = np.identity(len(x))
-    # Iteration counter
     iter_count = 0
-    # List to save the points visited by the method
     points = [x.copy()]
 
     while iter_count < 1000:
-        # Initialize a value to check convergence
         delta = 0
-        # Traverse through all directions
         for i in range(len(x)):
             direction = directions[i]
-            # Minimize function f along a one-dimensional variable
             alpha = golden(lambda alpha: f_wrapper(x + alpha * direction), -10, 10, eps)
-            # Update the current point
             x = x + alpha * direction
-            # Calculate the change in the point
             delta = max(delta, np.abs(alpha * direction).max())
-            # Add the point to the list
             points.append(x.copy())
 
-        # If convergence is achieved, exit the loop
         if delta < eps:
             break
 
-        # Update axis directions
         for i in range(len(x) - 1):
             directions[i] = directions[i + 1]
         directions[-1] = np.random.randn(len(x))
